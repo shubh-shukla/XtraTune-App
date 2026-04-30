@@ -1,0 +1,100 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - preview
+          - production
+
+jobs:
+  build-and-release:
+    name: Build APK and publish to Releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@4.6.0 --activate
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Resolve build profile
+        id: profile
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.profile }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=production" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Android APK on EAS (wait for completion)
+        id: build
+        run: |
+          BUILD_JSON=$(eas build \
+            --platform android \
+            --profile ${{ steps.profile.outputs.name }} \
+            --non-interactive \
+            --json \
+            --wait)
+          APK_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.buildUrl')
+          BUILD_ID=$(echo "$BUILD_JSON" | jq -r '.[0].id')
+          APP_VERSION=$(echo "$BUILD_JSON" | jq -r '.[0].appVersion')
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "app_version=$APP_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK from EAS
+        run: |
+          mkdir -p dist
+          curl -L -o dist/xtratune.apk "${{ steps.build.outputs.apk_url }}"
+          ls -lh dist/
+
+      - name: Determine release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=v${{ steps.build.outputs.app_version }}-${{ steps.build.outputs.build_id }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: XtraTune ${{ steps.tag.outputs.tag }}
+          body: |
+            Android APK built from commit ${{ github.sha }}.
+
+            **Always-latest install link:**
+            https://github.com/${{ github.repository }}/releases/latest/download/xtratune.apk
+
+            EAS build: https://expo.dev/accounts/shubham-shukla/projects/xtratune/builds/${{ steps.build.outputs.build_id }}
+          files: dist/xtratune.apk
+          make_latest: true

@@ -20,3 +20,9 @@ android/
 
 expo-env.d.ts
 # @end expo-cli
+# Yarn 4 (Berry)
+.yarn/cache
+.yarn/install-state.gz
+.yarn/unplugged
+.yarn/build-state.yml
+.pnp.*

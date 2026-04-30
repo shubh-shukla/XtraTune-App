@@ -13,7 +13,7 @@ const DEV_HOST =
 
 const DEV_PORT = process.env.EXPO_PUBLIC_DEV_PORT ?? "3000";
 
-const API_BASE = !__DEV__
+const API_BASE = __DEV__
   ? `http://${DEV_HOST}:${DEV_PORT}` // local dev – uses LAN IP from Expo
   : process.env.EXPO_PUBLIC_API_URL ?? ""; // production URL
 

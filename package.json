@@ -12,7 +12,8 @@
     "build:ios": "eas build --platform ios --profile production",
     "build:android": "eas build --platform android --profile production",
     "build:preview": "eas build --platform android --profile preview",
-    "build:preview:all": "eas build --platform all --profile preview"
+    "build:preview:all": "eas build --platform all --profile preview",
+    "eas-build-pre-install": "corepack enable && corepack prepare yarn@4.6.0 --activate"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.4",
@@ -39,6 +40,7 @@
     "expo-splash-screen": "~0.29.21",
     "expo-status-bar": "~2.0.1",
     "expo-system-ui": "~4.0.7",
+    "expo-updates": "~0.27.5",
     "expo-web-browser": "~14.0.2",
     "lottie-react-native": "7.1.0",
     "react": "18.3.1",

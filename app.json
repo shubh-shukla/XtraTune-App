@@ -26,7 +26,10 @@
         "backgroundColor": "#0a0a0a"
       },
       "package": "com.xtratune.app",
-      "permissions": ["FOREGROUND_SERVICE"]
+      "permissions": [
+        "FOREGROUND_SERVICE",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -46,6 +49,21 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f588a0f0-bee5-4e8f-850d-80355768ae73"
+      }
+    },
+    "owner": "shubham-shukla",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f588a0f0-bee5-4e8f-850d-80355768ae73"
     }
   }
 }
