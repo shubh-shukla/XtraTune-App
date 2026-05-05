@@ -21,6 +21,7 @@ import type { RepeatMode } from "@/store/player-slice";
 import { toggleSave } from "@/store/likes-slice";
 import { useAudioPlayerContext, setIsSeeking } from "@/hooks/AudioPlayerContext";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useListeningHistory } from "@/hooks/useListeningHistory";
 import { formatMillis, decodeHtml } from "@/utils";
 import { fetchLyrics } from "@/api";
 import type { LyricsData } from "@/types";
@@ -40,6 +41,7 @@ export default function FullScreenPlayer() {
   const currentItem = playlist[currentSong];
   const saves = useAppSelector((s) => s.likes.saves);
   const { isLiked, toggle: toggleFav } = useFavorites("track");
+  useListeningHistory(Math.floor((positionMillis ?? 0) / 1000));
 
   const [lyricsData, setLyricsData] = useState<LyricsData | null>(null);
   const [showLyrics, setShowLyrics] = useState(false);
