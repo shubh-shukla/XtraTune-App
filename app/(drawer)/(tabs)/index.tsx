@@ -16,6 +16,8 @@ import { fetchHomepage } from "@/api";
 import SongCard from "@/components/common/SongCard";
 import AlbumCard from "@/components/common/AlbumCard";
 import { HorizontalList } from "@/components/common/SectionList";
+import ForYouSection from "@/components/home/ForYouSection";
+import SmartPlaylistsSection from "@/components/home/SmartPlaylistsSection";
 import { HomeScreenSkeleton } from "@/components/common/Skeleton";
 import { getGreeting } from "@/utils";
 import type { HomepageData } from "@/types";
@@ -104,6 +106,8 @@ export default function HomeScreen() {
             {getGreeting()} 🎵
           </Text>
 
+          <ForYouSection />
+
           {/* Trending Songs */}
           {data?.trending?.songs && data.trending.songs.length > 0 && (
             <HorizontalList
@@ -161,6 +165,8 @@ export default function HomeScreen() {
               )}
             />
           )}
+
+          <SmartPlaylistsSection />
 
           <View style={{ height: 120 }} />
         </ScrollView>
