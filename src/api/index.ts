@@ -368,3 +368,69 @@ export async function savePlaybackState(state: {
     return false;
   }
 }
+// ─── Recommendations ───────────────────────────────
+
+export async function logListeningHistory(payload: {
+  songId: string;
+  title: string;
+  artist: string;
+  language?: string;
+}): Promise<boolean> {
+  try {
+    await api.post("/api/user/listening-history", payload);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export interface RecommendedItem {
+  songId?: string;
+  id?: string;
+  title?: string;
+  name?: string;
+  artist?: string;
+  primaryArtists?: string;
+  reason?: string;
+  image?: { quality?: string; link: string }[];
+  downloadUrl?: { quality?: string; link: string }[];
+  language?: string;
+}
+
+export async function fetchRecommendations(): Promise<{
+  source: string;
+  items: RecommendedItem[];
+}> {
+  try {
+    const { data } = await api.get("/api/recommendations");
+    return { source: data?.source ?? "guest", items: data?.items ?? [] };
+  } catch {
+    return { source: "guest", items: [] };
+  }
+}
+
+export async function refreshRecommendations(): Promise<boolean> {
+  try {
+    await api.post("/api/recommendations/refresh");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export interface SmartPlaylistItem {
+  name: string;
+  description: string;
+  theme: string;
+  songIds: string[];
+  image?: { quality?: string; link: string }[];
+}
+
+export async function fetchSmartPlaylists(): Promise<SmartPlaylistItem[]> {
+  try {
+    const { data } = await api.get("/api/smart-playlists");
+    return data?.playlists ?? [];
+  } catch {
+    return [];
+  }
+}
